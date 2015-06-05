@@ -1,0 +1,156 @@
+---
+title: "R Code for Social Network Analysis"
+author: "Erik Gjesfjeld"
+date: "June 4, 2015"
+output: html_document
+---
+
+This document contains the R code for the social network analysis of networks of compositional pottery data from the Kuril Islands. Documentation of this approach can be found in Gjesfjeld and Phillips (2013).  Please do not cite without permission from the author (erik.gjesfjeld@gmail.com).
+
+This R code assumes that a matrix specifying network relationships between archaeological sites has already been established.  If you compositional data, this is often through the use of cluster analysis, prinicipal component analysis and Mahalnobis Distance assignment as outlined by Glascock et al. (2004) and others (citations). This also assumes that you have installed the necessary packages into the R environment (sna, statnet)
+
+*1. Installing library and setting the working directory*
+```{r}
+library(sna)
+setwd("~/Dropbox/SNA")
+```
+
+
+*2. Reading in the raw data from text files*
+```{r,message=FALSE}
+#Reading in matrices for the different network graphs
+EJ_observed<-read.delim("EJ-observed.txt",header=T,row.names = 1)
+EJ_local<-read.delim("EJ-local.txt",header=T,row.names =1)
+EJ_recip<-read.delim("EJ-recip.txt",header=T,row.names =1)
+EJ_central<-read.delim("EJ-central.txt",header = T, row.names = 1)
+Okh_observed<-read.delim("Okh-observed.txt",header=T,row.names = 1)
+Okh_local<-read.delim("Okh-local.txt",header=T,row.names =1)
+Okh_recip<-read.delim("Okh-recip.txt",header=T,row.names =1)
+Okh_central<-read.delim("Okh-central.txt",header = T, row.names = 1)
+```
+
+*3. Creating Network Graphs*
+
+*Epi-Jomon Graphs*
+```{r}
+par(mfrow=c(2,2)) #Plotting four graphs together
+#par(mfrow=c(1,1)) #One graph at a time
+par(mar=c(1,1,1,1)) #reducing margins inbetween graphs, you may need to resize the plot window to have all the labels fit on the graphs
+gplot(EJ_observed,gmode="graph",label = row.names(EJ_observed)) #Observed network graph from geochem Data
+gplot(EJ_local,gmode="graph",label = row.names(EJ_local)) #Predicated local network graph
+gplot(EJ_recip,gmode="graph",label = row.names(EJ_recip)) #Predicated reciprocal network graph
+gplot(EJ_central,gmode="graph",label = row.names(EJ_central)) #Predicated reciprocal network graph
+```
+
+*Okhotsk Graphs*
+```{r}
+par(mfrow=c(2,2)) #Plotting four graphs together
+#par(mfrow=c(1,1)) #One graph at a time
+par(mar=c(1,1,1,1)) #reducing margins inbetween graphs, you may need to resize the plot window to have all the labels fit on the graphs
+gplot(Okh_observed,gmode="graph",label = row.names(Okh_observed)) #Observed network graph from geochem data
+gplot(Okh_local,gmode="graph",label = row.names(Okh_local)) #Predicated local network graph
+gplot(Okh_recip,gmode="graph",label = row.names(Okh_recip)) #Predicated reciprocal network graph
+gplot(Okh_central,gmode="graph",label = row.names(Okh_central)) #Predicated reciprocal network graph
+```
+
+*4. Getting Centrality Scores for Observed Network*
+
+*Epi-Jomon Centrality Scores*
+```{r}
+EJ_deg<-round(degree(EJ_observed,gmode="graph"),digits = 3) #Degree centrality
+EJ_between<-round(betweenness(EJ_observed,gmode="graph"),digits = 3)
+EJ_evcent<-round(evcent(EJ_observed,gmode="graph"), digits = 3)
+EJ_centrality<-cbind(row.names(EJ_observed),EJ_deg,EJ_between,EJ_evcent)
+EJ_centrality<-as.table(EJ_centrality)
+EJ_centrality
+```
+
+*Okhotsk Centrality Scores*
+```{r}
+Okh_deg<-round(degree(Okh_observed,gmode="graph"),digits = 3) #Degree centrality
+Okh_between<-round(betweenness(Okh_observed,gmode="graph"),digits = 3)
+Okh_evcent<-round(evcent(Okh_observed,gmode="graph"), digits = 3)
+Okh_centrality<-cbind(row.names(Okh_observed),Okh_deg,Okh_between,Okh_evcent)
+Okh_centrality<-as.table(Okh_centrality)
+Okh_centrality
+```
+
+*5. Graph Density Scores for All Networks*
+
+*Epi-Jomon*
+```{r}
+EJ_obs_gden<-round(gden(EJ_observed,mode="graph"),digits=3)
+EJ_local_gden<-round(gden(EJ_local,mode="graph"),digits=3)
+EJ_recip_gden<-round(gden(EJ_recip,mode="graph"),digits=3)
+EJ_central_gden<-round(gden(EJ_central,mode="graph"),digits=3)
+EJ_gden<-c(EJ_obs_gden,EJ_local_gden,EJ_recip_gden,EJ_central_gden)
+EJ_network_names<-c("EJ Observed","EJ Local", "EJ Reciprocity", "EJ Central")
+EJ_gden<-rbind(EJ_network_names,EJ_gden)
+EJ_gden<-as.table(EJ_gden)
+EJ_gden
+```
+
+*Okhotsk*
+```{r}
+Okh_obs_gden<-round(gden(Okh_observed,mode="graph"),digits=3)
+Okh_local_gden<-round(gden(Okh_local,mode="graph"),digits=3)
+Okh_recip_gden<-round(gden(Okh_recip,mode="graph"),digits=3)
+Okh_central_gden<-round(gden(Okh_central,mode="graph"),digits=3)
+Okh_gden<-c(Okh_obs_gden,Okh_local_gden,Okh_recip_gden,Okh_central_gden)
+Okh_network_names<-c("Okh Observed","Okh Local", "Okh Reciprocity", "Okh Central")
+Okh_gden<-rbind(Okh_network_names,Okh_gden)
+Okh_gden<-as.table(Okh_gden)
+Okh_gden
+```
+
+*6. Conditional Uniform Graph Test*
+
+*Epi-Jomon*
+```{r}
+EJ_cug_results<-cug.test(EJ_observed,gden,mode="graph")
+EJ_cug_results
+plot(EJ_cug_results)
+```
+
+*Okhotsk*
+```{r}
+Okh_cug_results<-cug.test(Okh_observed,gden,mode="graph")
+Okh_cug_results
+plot(Okh_cug_results)
+```
+
+*7. Network Regression*
+
+*Epi-Jomon*
+```{r}
+EJ_local_observed_netreg<-netlm(EJ_local,EJ_observed,nullhyp = "qap")
+EJ_recip_observed_netreg<-netlm(EJ_recip,EJ_observed,nullhyp = "qap")
+EJ_central_observed_netreg<-netlm(EJ_central,EJ_observed,nullhyp = "qap")
+EJ_network_names_netreg<-c("EJ Obs / Local", "EJ Obs / Reciprocity", "EJ Obs / Central")
+EJ_prob_less<-c(EJ_local_observed_netreg$pleeq[2],
+                EJ_recip_observed_netreg$pleeq[2],
+                EJ_central_observed_netreg$pleeq[2])
+EJ_prob_great<-c(EJ_local_observed_netreg$pgreq[2],
+                 EJ_recip_observed_netreg$pgreq[2],
+                 EJ_central_observed_netreg$pgreq[2])
+EJ_netreg_results<-cbind(EJ_network_names_netreg,EJ_prob_less,EJ_prob_great)
+EJ_netreg_results<-as.table(EJ_netreg_results)
+EJ_netreg_results
+```
+
+*Okhotsk*
+```{r}
+Okh_local_observed_netreg<-netlm(Okh_local,Okh_observed,nullhyp = "qap")
+Okh_recip_observed_netreg<-netlm(Okh_recip,Okh_observed,nullhyp = "qap")
+Okh_central_observed_netreg<-netlm(Okh_central,Okh_observed,nullhyp = "qap")
+Okh_network_names_netreg<-c("Okh Obs / Local", "Okh Obs / Reciprocity", "Okh Obs / Central")
+Okh_prob_less<-c(Okh_local_observed_netreg$pleeq[2],
+                 Okh_recip_observed_netreg$pleeq[2],
+                 Okh_central_observed_netreg$pleeq[2])
+Okh_prob_great<-c(Okh_local_observed_netreg$pgreq[2],
+                  Okh_recip_observed_netreg$pgreq[2],
+                  Okh_central_observed_netreg$pgreq[2])
+Okh_netreg_results<-cbind(Okh_network_names_netreg,Okh_prob_less,Okh_prob_great)
+Okh_netreg_results<-as.table(Okh_netreg_results)
+Okh_netreg_results
+```
